@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{APP_NAME}} API</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --border: #334155;
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --dim: #64748b;
+        --blue: #2563eb;
+        --blue-hover: #1d4ed8;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .wrap {
+        max-width: 420px;
+        width: 100%;
+        padding: 2rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      .sub {
+        color: var(--muted);
+        margin: 0.25rem 0 2rem;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .card-title {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--dim);
+        margin-bottom: 0.75rem;
+      }
+
+      .btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.4rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--bg);
+        color: var(--text);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+
+      .btn:last-child {
+        margin-bottom: 0;
+      }
+
+      .btn:hover {
+        background: var(--border);
+        border-color: #475569;
+      }
+
+      .btn svg {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+      }
+
+      .btn strong {
+        font-weight: 500;
+      }
+
+      .btn small {
+        display: block;
+        font-size: 0.78rem;
+        color: var(--dim);
+      }
+
+      .btn-primary {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: #fff;
+      }
+
+      .btn-primary:hover {
+        background: var(--blue-hover);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <h1>{{APP_NAME}} API</h1>
+      <p class="sub">Pencatatan Keuangan Rumah Tangga</p>
+
+      <div class="card">
+        <div class="card-title">Collection</div>
+        <a href="/download/collection" class="btn btn-primary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
+          </svg>
+          <div>
+            <strong>Download Postman Collection</strong
+            ><small>collection-respon.json</small>
+          </div>
+        </a>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Links</div>
+        <a href="/api/doc" class="btn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <div>
+            <strong>Swagger UI</strong><small>Interactive API docs</small>
+          </div>
+        </a>
+        <a href="{{BASE_URL}}/api/openapi" class="btn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+            />
+          </svg>
+          <div><strong>OpenAPI Spec</strong><small>Raw JSON schema</small></div>
+        </a>
+        <a href="/api/health" class="btn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <div><strong>Health Check</strong><small>API status</small></div>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,8 +1,20 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["ESNext"],
     "strict": true,
-    "types": ["bun"],
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "verbatimModuleSyntax": true,
+    "moduleResolution": "bundler",
+    "types": [
+      "bun"
+    ],
     "jsx": "react-jsx",
+    "outDir": "./dist",
     "jsxImportSource": "hono/jsx"
-  }
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }

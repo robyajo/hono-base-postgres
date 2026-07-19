@@ -1,5 +1,11 @@
 {
   "name": "hono-base-postgres",
+  "author": "robyajo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robyajo/hono-base-postgres.git"
+  },
+  "homepage": "https://github.com/robyajo/hono-base-postgres#readme",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
     "build": "bun x tsc && bun -e \"import fs from 'fs'; fs.mkdirSync('dist/src/html', { recursive: true }); fs.copyFileSync('src/html/index.html', 'dist/src/html/index.html'); fs.copyFileSync('src/html/manual-book.html', 'dist/src/html/manual-book.html');\"",
@@ -21,6 +27,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.2.0",
     "bcryptjs": "^3.0.3",
+    "bullmq": "^5.79.2",
     "better-auth": "^1.6.23",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^1.0.0-rc.4",

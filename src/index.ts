@@ -16,6 +16,7 @@ import { env, isDev } from "./config/drizzle.js";
 import { connectionPool } from "./db/index.js";
 import { checkPortOccupied } from "./lib/port.js";
 import { ensureStorageDirs, setupGracefulShutdown } from "./lib/server.js";
+import { websocket, setupWebSocketRoutes } from "./lib/websocket.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -119,11 +120,14 @@ app.notFound((c) => {
   return c.json({ error: "NotFound", message: `Cannot ${c.req.method} ${c.req.path}`, status: 404 }, 404);
 });
 
+// ─── WebSocket Routes ────────────────────────────────────────────────────────
+setupWebSocketRoutes(app);
+
 // ─── Server Startup & Lifecycle ──────────────────────────────────────────────
 const port = env.PORT;
 checkPortOccupied(port);
 
-const server = Bun.serve({ fetch: app.fetch, port });
+const server = Bun.serve({ fetch: app.fetch, port, websocket });
 console.log(`🚀 Server is running on http://localhost:${server.port}`);
 
 setupGracefulShutdown(server, connectionPool);

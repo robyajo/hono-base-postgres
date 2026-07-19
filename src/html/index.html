@@ -3,7 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="{{APP_NAME}} — High-performance RESTful API & Developer Portal powered by Hono, Bun, PostgreSQL, and Better Auth." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#0f172a" />
+
+    <!-- Open Graph Metadata -->
+    <meta property="og:title" content="{{APP_NAME}} — Developer Portal" />
+    <meta property="og:description" content="Interactive documentation, Swagger UI, Postman collection, and API explorer." />
+    <meta property="og:type" content="website" />
+
     <title>{{APP_NAME}} — Developer Portal</title>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -44,6 +55,12 @@
         overflow-x: hidden;
       }
 
+      /* Focus Ring Accessibility */
+      a:focus-visible, button:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 3px;
+      }
+
       /* Animated ambient background glow */
       body::before {
         content: '';
@@ -62,7 +79,7 @@
       .container {
         position: relative;
         z-index: 1;
-        max-width: 520px;
+        max-width: 540px;
         width: 100%;
       }
 
@@ -287,7 +304,7 @@
   </head>
 
   <body>
-    <div class="container">
+    <main class="container">
       <header class="header">
         <div class="badge-stack">
           <span class="pulse-dot"></span>
@@ -297,15 +314,14 @@
         <p class="subtitle">API & Developer Portal</p>
       </header>
 
-      <div class="card-group">
-        <!-- Manual Book & Collection Section -->
+      <section class="card-group">
+        <!-- Documentation & Assets -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Documentation & Assets</span>
           </div>
 
-          <!-- Developer Manual Book Link -->
-          <a href="/manual-book" target="_blank" class="btn btn-hero">
+          <a href="/manual-book" target="_blank" class="btn btn-hero" aria-label="Manual Book Development">
             <div class="btn-icon">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -318,8 +334,7 @@
             <span class="btn-tag">Guide</span>
           </a>
 
-          <!-- Postman Collection Download -->
-          <a href="/download/collection" class="btn">
+          <a href="/download/collection" class="btn" aria-label="Download Postman Collection">
             <div class="btn-icon">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -332,13 +347,13 @@
           </a>
         </div>
 
-        <!-- Interactive API Links -->
+        <!-- Interactive API Docs -->
         <div class="card">
           <div class="card-header">
             <span class="card-title">Interactive API Docs</span>
           </div>
 
-          <a href="/api/doc" class="btn">
+          <a href="/api/doc" class="btn" aria-label="Open Swagger UI">
             <div class="btn-icon">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -350,7 +365,7 @@
             </div>
           </a>
 
-          <a href="{{BASE_URL}}/api/openapi" target="_blank" class="btn">
+          <a href="{{BASE_URL}}/api/openapi" target="_blank" class="btn" aria-label="Open OpenAPI Spec">
             <div class="btn-icon">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
@@ -362,7 +377,7 @@
             </div>
           </a>
 
-          <a href="/api/health" class="btn">
+          <a href="/api/health" class="btn" aria-label="Check API Health Status">
             <div class="btn-icon">
               <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -374,17 +389,38 @@
             </div>
           </a>
         </div>
-      </div>
+        <!-- Developer & Repository Info -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Project Repository & Developer</span>
+          </div>
+
+          <a href="https://github.com/robyajo/hono-base-postgres" target="_blank" rel="noopener noreferrer" class="btn" aria-label="GitHub Repository">
+            <div class="btn-icon">
+              <svg fill="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+              </svg>
+            </div>
+            <div class="btn-content">
+              <strong>robyajo / hono-base-postgres</strong>
+              <small>View source code & documentation on GitHub</small>
+            </div>
+            <span class="btn-tag">GitHub</span>
+          </a>
+        </div>
+      </section>
 
       <footer class="footer">
-        <p>{{APP_NAME}} &bull; Development Server</p>
+        <p>{{APP_NAME}} &bull; Developed by <strong><a href="https://github.com/robyajo" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none;">@robyajo</a></strong></p>
         <div class="tech-tags">
           <span class="tech-tag">Bun v1.3</span>
           <span class="tech-tag">Hono v4</span>
           <span class="tech-tag">PostgreSQL</span>
           <span class="tech-tag">Better Auth</span>
+          <span class="tech-tag">BullMQ</span>
+          <span class="tech-tag">Redis</span>
         </div>
       </footer>
-    </div>
+    </main>
   </body>
 </html>

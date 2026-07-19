@@ -1,0 +1,14 @@
+services:
+    redis:
+        image: redis:7-alpine
+        container_name: kilex-redis
+        ports:
+            # Changed the host port to 6380 to avoid the conflict
+            - '6380:6379'
+        volumes:
+            - redis-data:/data
+        restart: unless-stopped
+        command: redis-server --appendonly yes
+
+volumes:
+    redis-data:

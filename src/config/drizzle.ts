@@ -20,6 +20,15 @@ const envSchema = z.object({
   BETTER_AUTH_COOKIE_DOMAIN: z.string().default("localhost"),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
+  // Optional Redis Configuration (BullMQ / Queue)
+  REDIS_ENABLED: z.coerce.boolean().default(false),
+  REDIS_HOST: z.string().default("127.0.0.1"),
+  REDIS_PORT: z.coerce.number().default(6379),
+  REDIS_PASSWORD: z.string().optional(),
+  REDIS_URL: z.string().default("redis://127.0.0.1:6379"),
+  // Optional WebSocket Configuration (Hono + Bun WS)
+  WS_ENABLED: z.coerce.boolean().default(false),
+  WS_PATH: z.string().default("/ws"),
 });
 
 const parsed = envSchema.safeParse(process.env);

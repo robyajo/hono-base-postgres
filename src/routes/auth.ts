@@ -4,14 +4,16 @@ import z from "zod";
 import { randomUUID, randomBytes } from "node:crypto";
 import { db } from "../db/index.js";
 import { user as UserTable, refreshToken as RefreshTokenTable } from "../db/schema/user.js";
+import { sosialMedia as SosialMediaTable } from "../db/schema/sosial-media.js";
 import { eq, sql } from "drizzle-orm";
 import { hashPassword, verifyPassword, upsertCredentialAccount } from "../lib/crypto.js";
 import { sign, verify } from "hono/jwt";
 import { env } from "../config/drizzle.js";
 import { auth } from "../auth.js";
 import { downloadAndSaveAvatar } from "../lib/avatar.js";
+import { sessionMiddleware, type AuthVariables } from "../middleware/auth.js";
 
-const app = new Hono();
+const app = new Hono<{ Variables: AuthVariables }>();
 
 // ─── Token Configuration ─────────────────────────────────────────────────────
 // Access token: 15 menit (pendek, untuk aksi API)
@@ -542,6 +544,219 @@ app.post(
         createdAt: existingUser?.createdAt ?? new Date(),
         updatedAt: existingUser?.updatedAt ?? new Date(),
       },
+    });
+  },
+);
+
+// ─── [GET] /me ── Ambil profil user authenticated ───────────────────────────
+app.get(
+  "/me",
+  sessionMiddleware,
+  describeRoute({
+    summary: "Get authenticated user profile",
+    description: "Returns currently authenticated user profile including social media links",
+    responses: {
+      200: {
+        description: "Profile retrieved successfully",
+        content: {
+          "application/json": {
+            schema: resolver(
+              z.object({
+                user: userResponseSchema.extend({
+                  sosialMedias: z.array(z.any()).optional(),
+                }),
+              }),
+            ),
+          },
+        },
+      },
+      401: { description: "Unauthorized" },
+    },
+  }),
+  async (c) => {
+    const currentUser = c.get("user");
+    if (!currentUser) return c.json({ error: "Unauthorized" }, 401);
+
+    const [userWithDetails] = await db
+      .select()
+      .from(UserTable)
+      .where(eq(UserTable.id, currentUser.id));
+
+    if (!userWithDetails) {
+      return c.json({ error: "User not found" }, 404);
+    }
+
+    const sosialMedias = await db
+      .select()
+      .from(SosialMediaTable)
+      .where(eq(SosialMediaTable.userId, currentUser.id));
+
+    return c.json({
+      user: {
+        id: userWithDetails.id,
+        name: userWithDetails.name,
+        email: userWithDetails.email,
+        role: userWithDetails.role,
+        image: userWithDetails.image,
+        createdFrom: userWithDetails.createdFrom,
+        createdAt: userWithDetails.createdAt,
+        updatedAt: userWithDetails.updatedAt,
+        sosialMedias,
+      },
+    });
+  },
+);
+
+// ─── [PUT] /update-profile ── Update nama dan/atau foto profil ─────────────
+const updateProfileSchema = z.object({
+  name: z.string().min(1).optional().describe("Updated display name"),
+  image: z.string().optional().describe("Updated avatar URL or local storage path"),
+});
+
+app.put(
+  "/update-profile",
+  sessionMiddleware,
+  describeRoute({
+    summary: "Update user profile",
+    description: "Update display name and/or avatar image for authenticated user",
+    responses: {
+      200: {
+        description: "Profile updated successfully",
+        content: {
+          "application/json": {
+            schema: resolver(
+              z.object({
+                message: z.string(),
+                user: userResponseSchema,
+              }),
+            ),
+          },
+        },
+      },
+      400: { description: "Bad request" },
+      401: { description: "Unauthorized" },
+    },
+  }),
+  validator("json", updateProfileSchema),
+  async (c) => {
+    const currentUser = c.get("user");
+    if (!currentUser) return c.json({ error: "Unauthorized" }, 401);
+
+    const { name, image } = c.req.valid("json");
+    if (!name && image === undefined) {
+      return c.json({ error: "No fields provided to update" }, 400);
+    }
+
+    let localImagePath: string | undefined = undefined;
+    if (image && image.startsWith("http")) {
+      const downloaded = await downloadAndSaveAvatar(currentUser.id, image);
+      if (downloaded) localImagePath = downloaded;
+    } else if (image !== undefined) {
+      localImagePath = image;
+    }
+
+    const updateData: Record<string, any> = { updatedAt: new Date() };
+    if (name) updateData.name = name;
+    if (localImagePath !== undefined) updateData.image = localImagePath;
+
+    await db
+      .update(UserTable)
+      .set(updateData)
+      .where(eq(UserTable.id, currentUser.id));
+
+    const [updatedUser] = await db
+      .select()
+      .from(UserTable)
+      .where(eq(UserTable.id, currentUser.id));
+
+    return c.json({
+      message: "Profile updated successfully",
+      user: {
+        id: updatedUser.id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        image: updatedUser.image,
+        createdFrom: updatedUser.createdFrom,
+        createdAt: updatedUser.createdAt,
+        updatedAt: updatedUser.updatedAt,
+      },
+    });
+  },
+);
+
+// ─── [PUT] /update-password ── Update password (wajib password lama) ──────
+const updatePasswordSchema = z
+  .object({
+    oldPassword: z.string().min(1).meta({ examples: ["Password123"] }).describe("Current account password (required)"),
+    newPassword: z.string().min(8).meta({ examples: ["NewPassword123"] }).describe("New password, min 8 characters"),
+    confirmNewPassword: z.string().min(8).meta({ examples: ["NewPassword123"] }).describe("Confirm new password, must match newPassword"),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: "New passwords don't match",
+    path: ["confirmNewPassword"],
+  });
+
+app.put(
+  "/update-password",
+  sessionMiddleware,
+  describeRoute({
+    summary: "Update account password",
+    description: "Change password for authenticated user. Requires valid old password.",
+    responses: {
+      200: {
+        description: "Password updated successfully",
+        content: {
+          "application/json": {
+            schema: resolver(
+              z.object({
+                message: z.string(),
+              }),
+            ),
+          },
+        },
+      },
+      400: { description: "Invalid request or incorrect old password" },
+      401: { description: "Unauthorized" },
+    },
+  }),
+  validator("json", updatePasswordSchema),
+  async (c) => {
+    const currentUser = c.get("user");
+    if (!currentUser) return c.json({ error: "Unauthorized" }, 401);
+
+    const { oldPassword, newPassword } = c.req.valid("json");
+
+    const [dbUser] = await db
+      .select()
+      .from(UserTable)
+      .where(eq(UserTable.id, currentUser.id));
+
+    if (!dbUser || !dbUser.passwordHash) {
+      return c.json({ error: "User password account not found" }, 400);
+    }
+
+    // Verify old password
+    const isOldPasswordValid = await verifyPassword(oldPassword, dbUser.passwordHash);
+    if (!isOldPasswordValid) {
+      return c.json({ error: "Incorrect old password" }, 400);
+    }
+
+    const newPasswordHash = await hashPassword(newPassword);
+
+    await db
+      .update(UserTable)
+      .set({
+        passwordHash: newPasswordHash,
+        tokenVersion: sql`token_version + 1`,
+        updatedAt: new Date(),
+      })
+      .where(eq(UserTable.id, currentUser.id));
+
+    await upsertCredentialAccount(currentUser.id, dbUser.email, newPasswordHash);
+
+    return c.json({
+      message: "Password updated successfully. Please login again with your new password.",
     });
   },
 );

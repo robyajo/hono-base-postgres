@@ -12,6 +12,8 @@ const envSchema = z.object({
   DB_NAME: z.string().default("hono_base"),
   DB_HOST: z.string().default("127.0.0.1"),
   DB_PORT: z.coerce.number().default(5432),
+  APP_ENV: z.enum(["development", "staging", "production"]).default("development"),
+  NODE_ENV: z.string().default("development"),
   ALLOWED_ORIGINS: z.string().default("http://localhost:3000"),
   BETTER_AUTH_SECRET: z.string().optional(),
   BETTER_AUTH_URL: z.string().default("http://localhost:3000"),
@@ -30,4 +32,7 @@ if (!parsed.success) {
 
 export const config = parsed.data;
 export const env = parsed.data;
+export const isProduction = parsed.data.APP_ENV === "production" || process.env.NODE_ENV === "production";
+export const isDev = !isProduction;
+
 

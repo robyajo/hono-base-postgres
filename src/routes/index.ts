@@ -8,7 +8,7 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { db } from "../db/index.js";
 import { sql } from "drizzle-orm";
 import z from "zod";
-import { env } from "../config/drizzle.js";
+import { env, isDev } from "../config/drizzle.js";
 
 const api = new Hono<{
   Variables: AuthVariables;
@@ -19,41 +19,43 @@ const api = new Hono<{
 // ═══════════════════════════════════════════════════════════════════════════════
 api.route("/auth", authRoute); // Auth (register, login, Better Auth)
 
-// ─── [GET] /openapi ── Generate spesifikasi OpenAPI ──────────────────────────
-// Menghasilkan dokumentasi OpenAPI JSON dari semua route yang terdaftar.
-api.get(
-  "/openapi",
-  openAPIRouteHandler(api, {
-    documentation: {
-      info: {
-        title: env.APP_NAME,
-        version: "1.0.0",
-        description: `${env.APP_NAME} API with Better Auth, Drizzle PostgreSQL, Bun runtime, Zod validation and Swagger UI documentation`,
-      },
-      servers: [
-        {
-          url: `${env.BASE_URL}/api`,
-          description: "Development Server",
+// ─── [GET] /openapi & /doc ── Development Only Documentation ──────────────────
+if (isDev) {
+  api.get(
+    "/openapi",
+    openAPIRouteHandler(api, {
+      documentation: {
+        info: {
+          title: env.APP_NAME,
+          version: "1.0.0",
+          description: `${env.APP_NAME} API with Better Auth, Drizzle PostgreSQL, Bun runtime, Zod validation and Swagger UI documentation`,
         },
-      ],
-      components: {
-        securitySchemes: {
-          bearerAuth: {
-            type: "http",
-            scheme: "bearer",
-            bearerFormat: "JWT",
-            description: "Paste your JWT token from /auth/login response",
+        servers: [
+          {
+            url: `${env.BASE_URL}/api`,
+            description: "Development Server",
+          },
+        ],
+        components: {
+          securitySchemes: {
+            bearerAuth: {
+              type: "http",
+              scheme: "bearer",
+              bearerFormat: "JWT",
+              description: "Paste your JWT token from /auth/login response",
+            },
           },
         },
+        security: [{ bearerAuth: [] }],
       },
-      security: [{ bearerAuth: [] }],
-    },
-  }),
-);
+    }),
+  );
 
-// ─── [GET] /doc ── Dashboard Swagger UI ───────────────────────────────────────
-// Tampilan visual dokumentasi API berdasarkan OpenAPI spec.
-api.get("/doc", swaggerUI({ url: "/api/openapi" }));
+  api.get("/doc", swaggerUI({ url: "/api/openapi" }));
+} else {
+  api.get("/openapi", (c) => c.json({ error: "Forbidden in production environment." }, 403));
+  api.get("/doc", (c) => c.json({ error: "Forbidden in production environment." }, 403));
+}
 
 const healthSchema = z.object({
   status: z.string(),

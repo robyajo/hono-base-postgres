@@ -3,17 +3,26 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{APP_NAME}} API</title>
+    <title>{{APP_NAME}} — Developer Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
-        --bg: #0f172a;
-        --card: #1e293b;
-        --border: #334155;
-        --text: #e2e8f0;
-        --muted: #94a3b8;
-        --dim: #64748b;
-        --blue: #2563eb;
-        --blue-hover: #1d4ed8;
+        --bg-radial: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+        --card-bg: rgba(30, 41, 59, 0.65);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --card-hover-border: rgba(99, 102, 241, 0.4);
+        --primary: #6366f1;
+        --primary-glow: rgba(99, 102, 241, 0.35);
+        --accent: #10b981;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --text-dim: #64748b;
+        --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
       }
 
       * {
@@ -23,66 +32,146 @@
       }
 
       body {
-        font-family:
-          system-ui,
-          -apple-system,
-          sans-serif;
-        background: var(--bg);
-        color: var(--text);
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        background: var(--bg-radial);
+        color: var(--text-main);
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 1.5rem;
+        position: relative;
+        overflow-x: hidden;
       }
 
-      .wrap {
-        max-width: 420px;
+      /* Animated ambient background glow */
+      body::before {
+        content: '';
+        position: absolute;
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(16, 185, 129, 0.05) 50%, transparent 70%);
+        filter: blur(80px);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .container {
+        position: relative;
+        z-index: 1;
+        max-width: 520px;
         width: 100%;
-        padding: 2rem;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .badge-stack {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 9999px;
+        background: rgba(99, 102, 241, 0.12);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #818cf8;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+        backdrop-filter: blur(10px);
+      }
+
+      .pulse-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.2); }
       }
 
       h1 {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 2.1rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.4rem;
       }
 
-      .sub {
-        color: var(--muted);
-        margin: 0.25rem 0 2rem;
+      .subtitle {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        font-weight: 400;
+      }
+
+      .card-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
       }
 
       .card {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 1.25rem;
-        margin-bottom: 0.75rem;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 1.5rem;
+        backdrop-filter: blur(16px);
+        box-shadow: var(--glass-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .card:hover {
+        border-color: var(--card-hover-border);
+        transform: translateY(-2px);
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
       }
 
       .card-title {
         font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        color: var(--dim);
-        margin-bottom: 0.75rem;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
       }
 
       .btn {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
+        gap: 1rem;
         width: 100%;
-        padding: 0.75rem 1rem;
-        margin-bottom: 0.4rem;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        background: var(--bg);
-        color: var(--text);
+        padding: 0.95rem 1.2rem;
+        margin-bottom: 0.6rem;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        background: rgba(15, 23, 42, 0.5);
+        color: var(--text-main);
         text-decoration: none;
-        font-size: 0.9rem;
-        transition:
-          background 0.15s,
-          border-color 0.15s;
+        font-size: 0.92rem;
+        font-weight: 600;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.25s ease;
       }
 
       .btn:last-child {
@@ -90,99 +179,212 @@
       }
 
       .btn:hover {
-        background: var(--border);
-        border-color: #475569;
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(99, 102, 241, 0.4);
+        transform: translateX(3px);
       }
 
-      .btn svg {
-        width: 18px;
-        height: 18px;
+      .btn-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         flex-shrink: 0;
+        color: #a5b4fc;
+        transition: all 0.25s ease;
       }
 
-      .btn strong {
-        font-weight: 500;
+      .btn:hover .btn-icon {
+        background: var(--primary);
+        color: #ffffff;
+        box-shadow: 0 0 15px var(--primary-glow);
       }
 
-      .btn small {
+      .btn-content {
+        flex: 1;
+      }
+
+      .btn-content strong {
+        display: block;
+        color: var(--text-main);
+        font-weight: 600;
+        line-height: 1.3;
+      }
+
+      .btn-content small {
         display: block;
         font-size: 0.78rem;
-        color: var(--dim);
+        color: var(--text-muted);
+        font-weight: 400;
+        margin-top: 0.15rem;
       }
 
-      .btn-primary {
-        background: var(--blue);
-        border-color: var(--blue);
-        color: #fff;
+      /* Featured Primary Card Button */
+      .btn-hero {
+        background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+        border: 1px solid rgba(199, 210, 254, 0.2);
+        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.35);
       }
 
-      .btn-primary:hover {
-        background: var(--blue-hover);
+      .btn-hero:hover {
+        background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+        box-shadow: 0 12px 30px rgba(99, 102, 241, 0.5);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      .btn-hero .btn-icon {
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+        border: none;
+      }
+
+      .btn-hero:hover .btn-icon {
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      .btn-tag {
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 2rem;
+        color: var(--text-dim);
+        font-size: 0.8rem;
+      }
+
+      .tech-tags {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-top: 0.6rem;
+      }
+
+      .tech-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
       }
     </style>
   </head>
 
   <body>
-    <div class="wrap">
-      <h1>{{APP_NAME}} API</h1>
-      <p class="sub">Pencatatan Keuangan Rumah Tangga</p>
+    <div class="container">
+      <header class="header">
+        <div class="badge-stack">
+          <span class="pulse-dot"></span>
+          <span>Hono + Bun + PostgreSQL</span>
+        </div>
+        <h1>{{APP_NAME}}</h1>
+        <p class="subtitle">API & Developer Portal</p>
+      </header>
 
-      <div class="card">
-        <div class="card-title">Collection</div>
-        <a href="/download/collection" class="btn btn-primary">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-            />
-          </svg>
-          <div>
-            <strong>Download Postman Collection</strong
-            ><small>collection-respon.json</small>
+      <div class="card-group">
+        <!-- Manual Book & Collection Section -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Documentation & Assets</span>
           </div>
-        </a>
+
+          <!-- Developer Manual Book Link -->
+          <a href="/manual-book" target="_blank" class="btn btn-hero">
+            <div class="btn-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <div class="btn-content">
+              <strong>Manual Book Development</strong>
+              <small>Click to view full architecture & guide</small>
+            </div>
+            <span class="btn-tag">Guide</span>
+          </a>
+
+          <!-- Postman Collection Download -->
+          <a href="/download/collection" class="btn">
+            <div class="btn-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </div>
+            <div class="btn-content">
+              <strong>Postman Collection</strong>
+              <small>Download collection-respon.json</small>
+            </div>
+          </a>
+        </div>
+
+        <!-- Interactive API Links -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Interactive API Docs</span>
+          </div>
+
+          <a href="/api/doc" class="btn">
+            <div class="btn-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div class="btn-content">
+              <strong>Swagger UI</strong>
+              <small>Interactive endpoint explorer</small>
+            </div>
+          </a>
+
+          <a href="{{BASE_URL}}/api/openapi" target="_blank" class="btn">
+            <div class="btn-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <div class="btn-content">
+              <strong>OpenAPI Spec</strong>
+              <small>Raw JSON schema definition</small>
+            </div>
+          </a>
+
+          <a href="/api/health" class="btn">
+            <div class="btn-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="btn-content">
+              <strong>Health Check</strong>
+              <small>Verify API & database status</small>
+            </div>
+          </a>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">Links</div>
-        <a href="/api/doc" class="btn">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <div>
-            <strong>Swagger UI</strong><small>Interactive API docs</small>
-          </div>
-        </a>
-        <a href="{{BASE_URL}}/api/openapi" class="btn">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-            />
-          </svg>
-          <div><strong>OpenAPI Spec</strong><small>Raw JSON schema</small></div>
-        </a>
-        <a href="/api/health" class="btn">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <div><strong>Health Check</strong><small>API status</small></div>
-        </a>
-      </div>
+      <footer class="footer">
+        <p>{{APP_NAME}} &bull; Development Server</p>
+        <div class="tech-tags">
+          <span class="tech-tag">Bun v1.3</span>
+          <span class="tech-tag">Hono v4</span>
+          <span class="tech-tag">PostgreSQL</span>
+          <span class="tech-tag">Better Auth</span>
+        </div>
+      </footer>
     </div>
   </body>
 </html>

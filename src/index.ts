@@ -14,7 +14,7 @@ import { serveStatic } from "hono/bun";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
-import { env } from "./config/drizzle.js";
+import { env, isDev } from "./config/drizzle.js";
 import { connectionPool } from "./db/index.js";
 import { execSync } from "node:child_process";
 
@@ -67,9 +67,16 @@ app.use(
 // Mount the main API router under /api
 app.route("/api", apiRouter);
 
-// ─── Home route — reads from src/index.html, replaces {{placeholders}} ──────
+// ─── Home route — reads from src/index.html in dev, returns JSON in production ─────
 const indexHtml = fs.readFileSync(path.join(__dirname, "index.html"), "utf-8");
 app.get("/", (c) => {
+  if (!isDev) {
+    return c.json({
+      name: env.APP_NAME,
+      status: "online",
+      message: "API service is running.",
+    });
+  }
   const html = indexHtml
     .replaceAll("{{APP_NAME}}", env.APP_NAME)
     .replaceAll("{{BASE_URL}}", env.BASE_URL);
@@ -79,17 +86,59 @@ app.get("/", (c) => {
 // ─── Favicon — suppress browser 404 warning ───────────────────────────────
 app.get("/favicon.ico", (c) => c.body(null, 204));
 
-// ─── Download collection-respon.json ───────────────────────────────────────
+// ─── Download collection-respon.json (Dev only) ─────────────────────────
 app.get("/download/collection", (c) => {
+  if (!isDev) {
+    return c.json({ error: "Forbidden: Download endpoints are disabled in production." }, 403);
+  }
   const filePath = path.resolve("collection-respon.json");
   if (!fs.existsSync(filePath)) {
-    return c.json({ error: "Collection file not found. Run: npm run collection" }, 404);
+    return c.json({ error: "Collection file not found. Run: bun run collection" }, 404);
   }
   const content = fs.readFileSync(filePath, "utf-8");
   return new Response(content, {
     headers: {
       "Content-Type": "application/json",
       "Content-Disposition": `attachment; filename="${env.APP_NAME.toLowerCase()}-collection.json"`,
+    },
+  });
+});
+
+// ─── Interactive Manual Book Development Reader (Dev only) ──────────────
+const manualBookHtmlPath = path.join(__dirname, "manual-book.html");
+const manualBookHtml = fs.existsSync(manualBookHtmlPath)
+  ? fs.readFileSync(manualBookHtmlPath, "utf-8")
+  : "";
+
+app.get("/manual-book", (c) => {
+  if (!isDev) {
+    return c.json({ error: "Forbidden: Development manual is disabled in production." }, 403);
+  }
+  const mdPath = path.resolve("manual-book-dev.md");
+  if (!fs.existsSync(mdPath)) {
+    return c.json({ error: "Manual book file not found." }, 404);
+  }
+  const rawMd = fs.readFileSync(mdPath, "utf-8");
+  const html = manualBookHtml
+    .replaceAll("{{APP_NAME}}", env.APP_NAME)
+    .replace("{{MANUAL_BOOK_CONTENT}}", rawMd);
+  return c.html(html);
+});
+
+// ─── Download Raw Manual Book (.md) (Dev only) ───────────────────────────
+app.get("/download/manual-book", (c) => {
+  if (!isDev) {
+    return c.json({ error: "Forbidden: Download endpoints are disabled in production." }, 403);
+  }
+  const mdPath = path.resolve("manual-book-dev.md");
+  if (!fs.existsSync(mdPath)) {
+    return c.json({ error: "Manual book file not found." }, 404);
+  }
+  const content = fs.readFileSync(mdPath, "utf-8");
+  return new Response(content, {
+    headers: {
+      "Content-Type": "text/markdown; charset=utf-8",
+      "Content-Disposition": 'attachment; filename="manual-book-dev.md"',
     },
   });
 });

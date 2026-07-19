@@ -2,7 +2,7 @@
   "name": "hono-base-postgres",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
-    "build": "bun x tsc && bun -e \"import fs from 'fs'; fs.mkdirSync('dist/src', { recursive: true }); fs.copyFileSync('src/index.html', 'dist/src/index.html'); fs.copyFileSync('src/manual-book.html', 'dist/src/manual-book.html');\"",
+    "build": "bun x tsc && bun -e \"import fs from 'fs'; fs.mkdirSync('dist/src/html', { recursive: true }); fs.copyFileSync('src/html/index.html', 'dist/src/html/index.html'); fs.copyFileSync('src/html/manual-book.html', 'dist/src/html/manual-book.html');\"",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",

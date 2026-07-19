@@ -12,5 +12,6 @@ export default defineConfig({
     user: config.DB_USER,
     host: config.DB_HOST,
     port: config.DB_PORT,
+    ssl: false,
   },
 });

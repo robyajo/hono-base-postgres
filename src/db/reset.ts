@@ -9,12 +9,13 @@ async function reset() {
   console.log("🔄 Resetting PostgreSQL database...");
 
   try {
-    // Drop and recreate public schema safely in PostgreSQL
-    console.log("🗑️ Dropping all tables in public schema...");
-    await db.execute(sql`DROP SCHEMA public CASCADE;`);
+    // Drop drizzle schema tracking table AND public schema so migrations re-apply cleanly
+    console.log("🗑️ Dropping public and drizzle schemas...");
+    await db.execute(sql`DROP SCHEMA IF EXISTS drizzle CASCADE;`);
+    await db.execute(sql`DROP SCHEMA IF EXISTS public CASCADE;`);
     await db.execute(sql`CREATE SCHEMA public;`);
     await db.execute(sql`GRANT ALL ON SCHEMA public TO public;`);
-    console.log("✅ Database public schema reset successfully!");
+    console.log("✅ Database schema reset successfully!");
 
     // Run migrations if migrations folder exists
     if (fs.existsSync("./src/db/drizzle")) {

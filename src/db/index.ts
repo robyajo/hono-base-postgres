@@ -7,11 +7,15 @@ import * as relationsFiles from "./relations.js";
 export const schema = { ...schemaFiles, ...relationsFiles };
 
 export const connectionPool = postgres({
-  host: config.DB_HOST || "127.0.0.1",
-  port: config.DB_PORT ? Number(config.DB_PORT) : 5432,
-  user: config.DB_USER || "postgres",
-  password: config.DB_PASSWORD || "",
-  database: config.DB_NAME || "hono_base",
+  host: config.DB_HOST,
+  port: Number(config.DB_PORT),
+  user: config.DB_USER,
+  username: config.DB_USER,
+  password: config.DB_PASSWORD,
+  pass: config.DB_PASSWORD,
+  database: config.DB_NAME,
+  db: config.DB_NAME,
+  ssl: false,
 });
 
 export const db = drizzle(connectionPool as any, { schema } as any);

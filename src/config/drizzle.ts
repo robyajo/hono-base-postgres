@@ -39,6 +39,13 @@ if (!parsed.success) {
   process.exit(1);
 }
 
+// Explicitly sync Postgres env vars to override OS defaults (e.g. Windows PGUSER)
+process.env.PGUSER = parsed.data.DB_USER;
+process.env.PGPASSWORD = parsed.data.DB_PASSWORD;
+process.env.PGHOST = parsed.data.DB_HOST;
+process.env.PGPORT = String(parsed.data.DB_PORT);
+process.env.PGDATABASE = parsed.data.DB_NAME;
+
 export const config = parsed.data;
 export const env = parsed.data;
 export const isProduction = parsed.data.APP_ENV === "production" || process.env.NODE_ENV === "production";
